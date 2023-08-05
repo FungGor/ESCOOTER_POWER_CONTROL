@@ -14,6 +14,11 @@ extern "C"
 #endif
 
 #include <stdint.h>
+#include <stdbool.h>
+
+#define MAXIMUM_PACKET_RETRANSMIT   0x0A
+#define COMMUNICATION_ACTIVE        0x01
+#define COMMUNICATION_NOT_ACTIVE    0x00
 
 typedef enum
 {
@@ -40,9 +45,28 @@ typedef struct
 	indicator_off switch_off;
 }Power_Status_Indicator;
 
+typedef struct
+{
+	bool    protocolFailure;
+	uint8_t RxPacketLossCount;
+}Power_Control_Heartbeat;
+
+typedef void (*reTransmit_Start)(void);
+typedef void (*reTransmit_Stop)(void);
+typedef struct
+{
+    reTransmit_Start reTransmissionOn;
+    reTransmit_Stop  reTransmissionOff;
+}Power_sysProtocol_Handler;
+
 void POWER_CONTROL_CONFG(POWER_Control *cmd);
 void POWER_SET_DEFAULT_STATE(POWER_State_t state);
 void POWER_CHANGE_STATE(POWER_State_t state);
+void Stop_RetransmissionTimer();
+void retransmissionTimerStart();
+void PacketLossCount();
+void POWER_PACKET_ACK ();
+void POWER_PROTOCOL_CHECKSTATUS();
 void POWER_SLEEP();
 void POWER_WAKEUP();
 void POWER_INDICATOR_CONFG(Power_Status_Indicator *indicator);
